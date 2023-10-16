@@ -36,6 +36,9 @@
                 @endforeach
             </div>
         </div>
+        <div class="d-flex justify-content-center">
+            {{$projects->links()}}
+        </div>
         <div class="py-5">
             <a class="btn btn-outline-success" style="margin-left:50%; transform:translateX(-50%)"
                 href="{{ route('admin.projects.create') }}">

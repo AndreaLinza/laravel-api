@@ -21,8 +21,9 @@ class ProjectController extends Controller
 
     public function index()
     {
-        $projects = Project::all();
-
+        //$projects = Project::all();
+        $projects = Project::paginate(4);
+        
         foreach($projects as $key => $project){
             $projects[$key]['short_description'] = $this->truncate($project['description'],150);
         }
