@@ -9,7 +9,7 @@
 
         <div class="card p-5 shadow">
 
-            <h1>{{ $project->title }}</h1>
+            <h1>{{ $project?->title }}</h1>
             <img class="" src="{{ asset('storage/' . $project->thumb) }}" alt="">
             <div class="card-body">
 

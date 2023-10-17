@@ -30,6 +30,7 @@ Route::middleware('auth','verified')
     ->name('admin.')
     ->group(function(){
         //Utilizziamo resource per assegnare in automatico le rotte
+        Route::get('/projects/trash', [ProjectController::class, 'trash'])->name('projects.trash');
         Route::resource("projects", ProjectController::class);  
 
         /////////////////////////// ALTRIMENTI ///////////////////

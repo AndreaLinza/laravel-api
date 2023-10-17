@@ -23,9 +23,9 @@ class ProjectController extends Controller
     {
         //$projects = Project::all();
         $projects = Project::paginate(4);
-        
-        foreach($projects as $key => $project){
-            $projects[$key]['short_description'] = $this->truncate($project['description'],150);
+
+        foreach ($projects as $key => $project) {
+            $projects[$key]['short_description'] = $this->truncate($project['description'], 150);
         }
 
         //compact lo vado ad utilizzare per poter abbreviare la forma di ['projects'=> $projects]
@@ -60,21 +60,20 @@ class ProjectController extends Controller
 
         $data = $request->validated();
 
-        
+
 
         //$data['language'] = explode(',', $data['language']);
 
 
         $counter = 0;
 
-        do{
+        do {
             $slug = Str::slug($data['title']) . ($counter > 0 ? '-' . $counter : '');
-    
+
             $alreadyExists = Project::where('slug', $slug)->first();
 
             $counter++;
-
-        }while($alreadyExists);
+        } while ($alreadyExists);
 
         $data['slug'] = $slug;
 
@@ -82,13 +81,13 @@ class ProjectController extends Controller
 
 
         $project = Project::create($data);
-                                                //Il ::create($data) lo vado ad utilizzare al posto di 
-                                                //$project = new Project();
-                                                //$project->fill($data);
-                                                //$project->save()
-                                                // In pratica va a fare un fill() e save() automatico
+        //Il ::create($data) lo vado ad utilizzare al posto di 
+        //$project = new Project();
+        //$project->fill($data);
+        //$project->save()
+        // In pratica va a fare un fill() e save() automatico
 
-        if(key_exists('technologies',$data)){
+        if (key_exists('technologies', $data)) {
             $project->technologies()->attach($data['technologies']);
         }
 
@@ -98,18 +97,20 @@ class ProjectController extends Controller
 
     // -----------Edit Section----------- //
 
-    public function edit($slug){
+    public function edit($slug)
+    {
         $project = Project::where('slug', $slug)->firstOrFail();
         $types = Type::all();
         $technologies = Technology::all();
 
-        return view('admin.projects.edit', compact('project','types','technologies'));
+        return view('admin.projects.edit', compact('project', 'types', 'technologies'));
     }
 
 
     // ----------Update Section-------- //
 
-    public function update(UpdateProjectRequest $request, $slug){
+    public function update(UpdateProjectRequest $request, $slug)
+    {
         $project = Project::where('slug', $slug)->firstOrFail();
 
 
@@ -120,19 +121,18 @@ class ProjectController extends Controller
         //Non è detto che vada a cambiare l'immagine ogni volta che faccio l'update
         //perciò si fa un if per evitare di usare lo Storage::put
 
-        if (isset($data['thumb'])){
+        if (isset($data['thumb'])) {
 
 
             //se esiste già un immagine, prima la cancello
-            if($project->thumb){
+            if ($project->thumb) {
                 Storage::delete($project->thumb);
             }
 
             // salvo il file nel filesystem
             $image_path = Storage::put('projects', $data['thumb']);
-            
-            $data['thumb'] = $image_path;
 
+            $data['thumb'] = $image_path;
         }
         // il sync($data['nome'])
         // esegue il detach SOLO delle technology non presenti nel nuovo array
@@ -145,31 +145,51 @@ class ProjectController extends Controller
         return redirect()->route('admin.projects.show', $project->slug);
     }
 
+    // -------------- Trash Section -------------- //
+
+    public function trash()
+    {
+        $projects = Project::onlyTrashed()->get();
+        return view('admin.projects.trash', compact('projects'));
+    }
+
+
+
+
     // -------------Destroy Section---------- //
 
-    public function destroy($slug){
-        if(Auth::user()->email !== 'andrealinza@gmail.com'){
+    public function destroy(Request $request, $slug)
+    {
+        if (Auth::user()->email !== 'andrealinza@gmail.com') {
             return abort(403);
         }
 
-        $project = Project::where('slug', $slug)->firstOrFail();
+        if ($request->input('force')) {
+            $project = Project::onlyTrashed()->where('slug', $slug)->firstOrFail();
 
-        if($project->thumb){
-            Storage::delete($project->thumb);
+            if ($project->thumb) {
+                Storage::delete($project->thumb);
+            }
+            $project->technologies()->detach();
+
+            $project->forceDelete();
+        } else {
+
+            $project = Project::where('slug', $slug)->firstOrFail();
+
+            //$project->technologies()->detach();
+
+            $project->delete();
         }
 
-        $project->technologies()->detach();
-
-        $project->delete();
-        
-
-        return redirect()->route('admin.projects.index');
+        return redirect()->route('admin.projects.trash');
     }
 
 
     // -------------Truncate Section -------------- //
 
-    private function truncate($text, $chars = 25) {
+    private function truncate($text, $chars = 25)
+    {
         if (strlen($text) <= $chars) {
             return $text;
         }
@@ -179,5 +199,4 @@ class ProjectController extends Controller
         $text = $text . "...";
         return $text;
     }
-
 }
