@@ -22,7 +22,7 @@
             @csrf
             @method('DELETE')
 
-            <button class="btn btn-danger">Elimina</button>
+            <button class="my-small-button"><span>Elimina</span></button>
         </form>
     </div>
 

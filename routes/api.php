@@ -23,3 +23,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //non serve scrivere /api perchè siamo dentro api.php
 //quindi tutte le rotte di questo file saranno raggiungibili tramite api/pathRotta
 Route::get('projects', [ProjectController::class, 'index']);
+Route::get('projects/{slug}', [ProjectController::class, 'show']);

@@ -25,8 +25,8 @@
                 <small class="card-text">{{ $project->release->format('d/m/y') }}</small>
             </div>
             <div class="d-flex m-auto">
-                <a href="{{ route('admin.projects.index') }}" class="btn btn-secondary h-75 m-3">Indietro</a>
-                <a href="{{ route('admin.projects.edit', $project->slug) }}" class="btn btn-primary m-3 h-75">Edit</a>
+                <a href="{{ route('admin.projects.index') }}" class="my-button h-75 m-3"><span>Indietro</span></a>
+                <a href="{{ route('admin.projects.edit', $project->slug) }}" class="my-button m-3 h-75"><span>Edit</span></a>
             </div>
         </div>
 
