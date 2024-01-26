@@ -5,3 +5,13 @@
 @import 'partials/footer';
 @import 'partials/main';
 
+body{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: auto !important;
+}
+
+#app{
+    display:contents;
+}
